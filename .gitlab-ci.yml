@@ -1,0 +1,81 @@
+default:
+  image:
+    name: alpine/gitlab-ansible-terraform:latest
+      - /usr/bin/env
+      - "PATH=/opt/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  before_script:
+    - terraform --version
+    - cd "${CI_PROJECT_DIR}/f5-prod-deployments"
+    - |
+      terraform init -backend-config=resource_group_name=${ARM_RESOURCE_GROUP_NAME} \
+      -backend-config=storage_account_name=${ARM_STORAGE_ACCOUNT_NAME} \
+      -backend-config=container_name=${ARM_CONTAINER_NAME} \
+      -backend-config=key=${ARM_KEY}
+    # - mkdir -p "$VSPHERE_CLIENT_DEBUG_PATH"
+
+variables:
+  LOCK_ID: "skip"
+  # VSPHERE_CLIENT_DEBUG_PATH: "${CI_PROJECT_DIR}/vmwarelog"
+  # VSPHERE_CLIENT_DEBUG: "true"
+  INSTANCE:
+    description: "F5 Instance to deploy"
+  TERRAFORM_STAGE:
+    value: "Plan"
+    options:
+      - "Plan"
+      - "Apply"
+      - "Destroy"
+      - "Unlock"
+    description: "Which Terraform stage to run"
+  TFVARS_FILE: "${CI_PROJECT_DIR}/f5-deployments/tfvars_folder/${INSTANCE}.tfvars"
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+      when: never
+    - when: always
+
+stages:
+  - unlock
+  - validate
+  - plan
+  - apply
+  - destroy
+
+unlock:
+  stage: unlock
+  script:
+    - terraform force-unlock -force $LOCK_ID
+  rules:
+    - if: $LOCK_ID != "skip" && $TERRAFORM_STAGE == "Unlock"
+
+terraform:validate:
+  stage: validate
+  script:
+    - terraform fmt -recursive -check -diff
+    - terraform validate
+
+terraform:plan:
+  stage: plan
+  script:
+    - terraform plan -input=false -var-file=${TFVARS_FILE}
+  needs:
+    - terraform:validate
+
+terraform:apply:
+  stage: apply
+  script:
+    - terraform apply -auto-approve -var-file=${TFVARS_FILE}
+  rules:
+    - if: $TERRAFORM_STAGE == "Apply" && $CI_COMMIT_BRANCH == "main"
+  # artifacts:
+  #   paths:
+  #   - "$VSPHERE_CLIENT_DEBUG_PATH"
+  #   when: always
+
+terraform:destroy:
+  stage: destroy
+  script:
+    - terraform destroy -auto-approve -var-file=${TFVARS_FILE}
+  rules:
+    - if: $TERRAFORM_STAGE == "Destroy" && $CI_COMMIT_BRANCH == "main"

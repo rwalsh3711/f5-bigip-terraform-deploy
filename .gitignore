@@ -1,0 +1,17 @@
+**/.terraform/*
+
+# Files with sensitive data
+*.tfstate
+*.tfstate.*
+
+# Lock file
+.terraform.lock.hcl.DS_Store
+
+# devcontainer
+.devcontainer/
+
+# Mac DS_Store
+.DS_Store
+
+# Roles
+*/roles
