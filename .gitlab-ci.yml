@@ -5,12 +5,16 @@ default:
       - "PATH=/opt/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   before_script:
     - terraform --version
-    - cd "${CI_PROJECT_DIR}/f5-prod-deployments"
-    - |
-      terraform init -backend-config=resource_group_name=${ARM_RESOURCE_GROUP_NAME} \
-      -backend-config=storage_account_name=${ARM_STORAGE_ACCOUNT_NAME} \
-      -backend-config=container_name=${ARM_CONTAINER_NAME} \
-      -backend-config=key=${ARM_KEY}
+    - cd "${CI_PROJECT_DIR}/f5-deployments"
+    - |-
+      terraform init -backend-config="address=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${INSTANCE}_${CI_PROJECT_NAME}" \
+        -backend-config="lock_address=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${INSTANCE}_${CI_PROJECT_NAME}/lock" \
+        -backend-config="unlock_address=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${INSTANCE}_${CI_PROJECT_NAME}/lock" \
+        -backend-config="username=${CICD_USERNAME}" \
+        -backend-config="password=${CICD_USER_TOKEN}" \
+        -backend-config="lock_method=POST" \
+        -backend-config="unlock_method=DELETE" \
+        -backend-config="retry_wait_min=5"
     # - mkdir -p "$VSPHERE_CLIENT_DEBUG_PATH"
 
 variables:
