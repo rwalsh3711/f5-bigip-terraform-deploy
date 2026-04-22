@@ -57,7 +57,7 @@ The root of this repository also contains the _.gitlab-ci.yml_ file used for the
 ### **Variables**
 
 
-Under the **f5-prod-deployments** folder exists a sub-folder named **tfvars_folder**. This folder contains the tfvars files used for deployments. The files use a naming convention of _hostname.tfvars_. The file to use is defined to the pipeline using the variable name ***INSTANCE*** in the format "_hostname_". The extension **.tfvars** is appended automatically.
+Under the **f5-deployments** folder exists a sub-folder named **tfvars_folder**. This folder contains the tfvars files used for deployments. The files use a naming convention of _hostname.tfvars_. The file to use is defined to the pipeline using the variable name ***INSTANCE*** in the format "_hostname_". The extension **.tfvars** is appended automatically.
 
 These tfvars files define specific variables used by the modules for build-out of the resources. The main variables are:
 
@@ -68,7 +68,7 @@ These tfvars files define specific variables used by the modules for build-out o
 | vsphere_cluster | cluster01 | The vSphere cluster where the resources should be built |
 | vsphere_datastore | datastore01-vsan | The vSphere datastore used by the VMs |
 | vsphere_folder | f5 | The vSphere VM folder where the resources will reside |
-| vm_template_name | TMPL-BIGIP-17.1.2.1-0.0.2 | The vSphere template to use when creating the F5 VMs |
+| vm_template_name | TMPL-BIGIP-17.1.1.3-0.0.5 | The vSphere template to use when creating the F5 VMs |
 | port_groups | ["MGMT_PORT_GROUP", "HA_SYNC_PORT_GROUP", "DATA_PORT_GROUP"] | List of vSphere port groups for VM network interfaces |
 | f5_vms | See below | List of objects for each F5 VM to deploy |
 | cpus | 8 | Number of vCPUs to assign to each F5 BIG-IP VM |
@@ -108,12 +108,12 @@ Sensitive variables (set via CI/CD or environment):
 
 To deploy new F5 instances perform the following steps:
 
-2. Create a new tfvars file under the **tfvars_folder**
-3. Populate the new tfvars files with the desired values for the variables defined above and push to the repository.
-4. In the Gitlab repository, navigate to **CI/CD** - **Pipelines** and select "Run Pipeline" in the upper right.
-5. For the value for the **INSTANCE** variable, enter the name of tfvars file you created (without the *.tfvars* extension.)
-6. Select the stage you wish to run from the **TERRAFORM_STAGE** dropdown (plan, apply, destroy)
-7. (OPTIONAL) Add an additional variable named **LOCK_ID** along with the value of that lock ID on the state file should the state file have a hung lock.
+1. Create a new tfvars file under the **tfvars_folder**
+2. Populate the new tfvars files with the desired values for the variables defined above and push to the repository.
+3. In the Gitlab repository, navigate to **CI/CD** - **Pipelines** and select "Run Pipeline" in the upper right.
+4. For the value for the **INSTANCE** variable, enter the name of tfvars file you created (without the *.tfvars* extension.)
+5. Select the stage you wish to run from the **TERRAFORM_STAGE** dropdown (plan, apply, destroy)
+6. (OPTIONAL) Add an additional variable named **LOCK_ID** along with the value of that lock ID on the state file should the state file have a hung lock.
 
 ### **Known Errors and Limitations**
 - N/A
@@ -125,7 +125,7 @@ To deploy new F5 instances perform the following steps:
 - Support for vCenter tagging
 
 **v1.0**
-- Inital launch
+- Initial launch
 
 ### **Footnotes**
 

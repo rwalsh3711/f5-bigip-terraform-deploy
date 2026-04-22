@@ -1,6 +1,7 @@
 default:
   image:
     name: alpine/gitlab-ansible-terraform:latest
+    entrypoint:
       - /usr/bin/env
       - "PATH=/opt/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   before_script:

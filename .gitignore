@@ -5,7 +5,7 @@
 *.tfstate.*
 
 # Lock file
-.terraform.lock.hcl.DS_Store
+.terraform.lock.hcl
 
 # devcontainer
 .devcontainer/
